@@ -1,0 +1,30 @@
+name: Execução Diária do Robô
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # Executa diariamente às 10h UTC (7h no Brasil)
+  workflow_dispatch:  # Permite executar manualmente
+
+jobs:
+  executar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Clonar repositório
+      uses: actions/checkout@v3
+
+    - name: 📦 Instalar dependências
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🤖 Executar robô
+      run: python robo.py
+
+    - name: 🆙 Commit do relatório
+      run: |
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add dados/relatorio.csv
+        git commit -m "Atualização diária do relatório"
+        git push
